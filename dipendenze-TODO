@@ -7,12 +7,28 @@ accetta get su /view/
 /save/ post
 
 TODO:
-Store templates in tmpl/ and page data in data/.
-Add a handler to make the web root redirect to /view/FrontPage.
-
-Connettere mongo a go
-accoppaire post a query di mongo
-
 R legge mongo
 R salva immagine
 Go legge immagine
+
+Togliere il path assoluto e creare sensore eseguibile 
+
+Store templates in tmpl/ and page data in data/ (refactor albero dei files)
+
+Pulizia e creazione interfaccia web
+gestione immagini
+Root con link a tutti i sensori noti
+View del sensore contiene jpg
+
+
+
+DONE:
+Connettere mongo a go 
+accoppaire post a query di mongo X
+
+
+
+
+webserver\mongo> go build
+cd .\server\ 
+go install

@@ -69,14 +69,15 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
- //   body := r.FormValue("body")
+    body := r.FormValue("body")
     r.ParseForm()
-    println(r.Form)
+    println(r.Form.Get("Device Id"))
+
   //  for key,value := range r.Form {
 
 //    fmt.Println("%s = %s ", key, value) 
 
-    //mongo.PostTemperature(sensorID, timestamp, temperature, Client)
+    mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("temperatura"),r.Form.Get("timestamp") , Client)
 /*
 "Device Id" -> deviceId, "temperatura" -> temperatura.toString,
  "timpestamp" -> timestamp.toString)
