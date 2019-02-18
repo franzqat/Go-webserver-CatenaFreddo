@@ -1,0 +1,18 @@
+https://github.com/mongodb/mongo-go-driver
+
+
+gira su localhost:8080
+accetta get su /view/
+/edit/
+/save/ post
+
+TODO:
+Store templates in tmpl/ and page data in data/.
+Add a handler to make the web root redirect to /view/FrontPage.
+
+Connettere mongo a go
+accoppaire post a query di mongo
+
+R legge mongo
+R salva immagine
+Go legge immagine

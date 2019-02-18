@@ -7,7 +7,7 @@ import (
 	"log"
 	"regexp"
 	"errors"
-	"fmt"
+	_ "fmt"
     "webserver/mongo"
 )
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
@@ -33,9 +33,9 @@ func loadPage(title string) (*Page,error) {
     return &Page{Title: title, Body: body},nil
 }
 
-func main() {
+var Client = mongo.ConnectToMongo()
 
-    mongo.ConnectToMongo()
+func main() {
 
     http.HandleFunc("/view/", makeHandler(viewHandler))
     http.HandleFunc("/edit/", makeHandler(editHandler))
@@ -69,11 +69,19 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
-    body := r.FormValue("body")
+ //   body := r.FormValue("body")
     r.ParseForm()
-    for key,value := range r.Form {
-    fmt.Printf("%s = %s ", key, value) 
-    }
+    println(r.Form)
+  //  for key,value := range r.Form {
+
+//    fmt.Println("%s = %s ", key, value) 
+
+    //mongo.PostTemperature(sensorID, timestamp, temperature, Client)
+/*
+"Device Id" -> deviceId, "temperatura" -> temperatura.toString,
+ "timpestamp" -> timestamp.toString)
+
+    }*/
     p := &Page{Title: title, Body: []byte(body)}
     err := p.save()
     if err != nil {
@@ -104,3 +112,10 @@ func makeHandler(fn func (http.ResponseWriter, *http.Request, string)) http.Hand
         fn(w, r, m[2])
 	}
 }
+
+
+/*
+    mongo.ConnectToMongo()
+    mongo.Disconnect()
+    mongo.PostTemperature(sensorID, timestamp, temperature)
+*/

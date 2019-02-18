@@ -5,78 +5,78 @@ import (
     "fmt"
     "log"
 
-    "github.com/mongodb/mongo-go-driver/bson"
+    _ "github.com/mongodb/mongo-go-driver/bson"
     "github.com/mongodb/mongo-go-driver/mongo"
   //  "github.com/mongodb/mongo-go-driver/mongo/options"
 )
 
-type Trainer struct {
-    Name string
-    Age  int
-    City string
+type Messaggio struct {
+    Timestamp  string
+    Temperatura string
 }
 
-func ConnectToMongo() {
+
+func ConnectToMongo() (*mongo.Client) {
 
     // Rest of the code will go here
-    client, err := mongo.Connect(context.TODO(), "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
+    Client, err := mongo.Connect(context.TODO(), "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
 
-if err != nil {
-    log.Fatal(err)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    // Check the connection
+    err = Client.Ping(context.TODO(), nil)
+
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Println("Connected to MongoDB!")
+    return Client
 }
 
-// Check the connection
-err = client.Ping(context.TODO(), nil)
+func PostTemperature(sensorID string, timestamp string, temperature string, Client *mongo.Client) {
 
-if err != nil {
-    log.Fatal(err)
+
+    collection := Client.Database("test").Collection(sensorID)
+
+
+    msg := Messaggio{timestamp, temperature}
+    //POST al database
+    insertResult, err := collection.InsertOne(context.TODO(), msg)
+    if err != nil {
+        log.Fatal(err)
+    } else {
+    fmt.Println("Inserted a single document: ", insertResult.InsertedID)
+    }
 }
-
-fmt.Println("Connected to MongoDB!")
-
 
 /*
-//ash := Trainer{"Ash", 10, "Pallet Town"}
-misty := Trainer{"Misty", 10, "Cerulean City"}
-brock := Trainer{"Brock", 15, "Pewter City"}
+func Get(sensorID string){
+    filter := bson.D{{"name", "Misty"}}
+    collection := client.Database("test").Collection(sensorID)
+    /**
+    * GET
+    */
+    // create a value into which the result can be decoded
+ /*   var result Messaggio
+
+    err = collection.FindOne(context.TODO(), filter).Decode(&result)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Printf("Found a single document: %+v\n", result)
 
 */
-collection := client.Database("test").Collection("trainers")
 
-/* 
-
-trainers := []interface{}{misty, brock}
-//POST al database
-insertManyResult, err := collection.InsertMany(context.TODO(), trainers)
-if err != nil {
-    log.Fatal(err)
-}
-
-fmt.Println("Inserted multiple documents: ", insertManyResult.InsertedIDs)
-*/
-
-filter := bson.D{{"name", "Misty"}}
+func Disconnect(Client *mongo.Client){
+    err := Client.Disconnect(context.TODO())
 
 
-/**
-* GET
-*/
-// create a value into which the result can be decoded
-var result Trainer
-
-err = collection.FindOne(context.TODO(), filter).Decode(&result)
-if err != nil {
-    log.Fatal(err)
-}
-
-fmt.Printf("Found a single document: %+v\n", result)
-
-
-
-err = client.Disconnect(context.TODO())
-
-if err != nil {
-    log.Fatal(err)
-}
-fmt.Println("Connection to MongoDB closed.")
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println("Connection to MongoDB closed.")
 }
