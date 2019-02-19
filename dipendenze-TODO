@@ -8,7 +8,7 @@ install.packages("mongolite")
 http://r-statistics.co/ggplot2-Tutorial-With-R.html#1.%20The%20Setup
 install.packages("ggplot2")
 install.packages("ggfortify")
-
+library(ggpmisc)
 _______________________________________________
 
 ServerGO:
@@ -18,34 +18,42 @@ accetta get su /view/
 /save/ post
 _______________________________________________
 TODO:
-R legge mongo
-R salva immagine
-Go legge immagine
 
-Togliere il path assoluto e creare sensore eseguibile 
-
+GO:
+Associazione e creazione pagine web per le immagini trovate e i rispettivi sensori
+Root con link a tutti i sensori noti /frontpage
+Pagina View del sensore contiene jpg
+Pulizia e creazione interfaccia web
+Gestione allarmi
 Store templates in tmpl/ and page data in data/ (refactor albero dei files)
 
-Pulizia e creazione interfaccia web
-gestione immagini
-Root con link a tutti i sensori noti
-View del sensore contiene jpg
-Configurazione e rimozione path assoluto scala sensore
+SCALA:
+Rimozione path assoluto configurazione scala sensore
+
+R:
+Disaccoppiare script
+Automatizzare running (sempre o a richiesta)
 _______________________________________________
 
 DONE:
 Connettere mongo a go 
 accoppaire post a query di mongo X
 BONUS: jar di scala eseguibile
+R legge mongo
+R salva immagine
 _______________________________________________
 
 Compila GO
-webserver\mongo> go build
+HOW TO RUN GO
+cd webserver\mongo
+go build
+cd ..
 cd .\server\ 
 go install
+server
 _______________________________________________
 
-
+R: Lancia script R-Handler
 
 url <- "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true"
 dmd <- mongo("45588774", url = url)
@@ -62,28 +70,9 @@ ggplot(alldata,aes(x=timestamp, y=temperatura))  + geom_point(aes(x=timestamp, y
 
 library(ggfortify)
 autoplot(alldata) + labs(title="Temperatura") 
-
+library(ggpmisc)
 
 ggplot(alldata) +   geom_line(aes(x=timestamp,y=temperatura)) +   labs(title="Chart")
-
+alldata <- dmd$find('{}')
 _______________________________________________
 
-library(mongolite)
-library(ggplot2)
-library(scales) # per date_format
-
-dmd <- mongo("45588774", url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
-alldata <- dmd$find('{}')
-print(alldata)
-
-
-# converte i timestamp in orario leggibile
-alldata$timestamp <- as.POSIXct(as.numeric(as.character(alldata$timestamp)), origin="1970-01-01", tz="Etc/GMT+1")
-
-#PLOT
-plot1 <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) + geom_line(size=1) + ylim(-26,-16) + scale_x_datetime(labels = date_format("%m-%d  %H:%M")) + theme(axis.text.x = element_text(angle = 0, vjust=0.5, size=10),panel.grid.minor = element_blank()) + geom_bar()
-plot(plot1)
-
-#ggsave("myggplot.png", plot=plot1)  # save a stored ggplot
-
-#ggsave("myggplot.png")  # saves the last plot.
