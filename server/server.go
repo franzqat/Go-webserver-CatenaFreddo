@@ -77,7 +77,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 
 //    fmt.Println("%s = %s ", key, value) 
 
-    mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("temperatura"),r.Form.Get("timestamp") , Client)
+    mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("timestamp"),r.Form.Get("temperatura") , Client)
 /*
 "Device Id" -> deviceId, "temperatura" -> temperatura.toString,
  "timpestamp" -> timestamp.toString)

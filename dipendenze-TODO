@@ -1,11 +1,22 @@
+GO
 https://github.com/mongodb/mongo-go-driver
 
+R
+https://jeroen.github.io/mongolite/
+install.packages("mongolite")
 
+http://r-statistics.co/ggplot2-Tutorial-With-R.html#1.%20The%20Setup
+install.packages("ggplot2")
+install.packages("ggfortify")
+
+_______________________________________________
+
+ServerGO:
 gira su localhost:8080
 accetta get su /view/
 /edit/
 /save/ post
-
+_______________________________________________
 TODO:
 R legge mongo
 R salva immagine
@@ -20,15 +31,56 @@ gestione immagini
 Root con link a tutti i sensori noti
 View del sensore contiene jpg
 
-
+_______________________________________________
 
 DONE:
 Connettere mongo a go 
 accoppaire post a query di mongo X
 
+_______________________________________________
 
-
-
+Compila GO
 webserver\mongo> go build
 cd .\server\ 
 go install
+_______________________________________________
+
+
+
+url <- "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true"
+dmd <- mongo("45588774", url = url)
+
+
+library(mongolite)
+dmd <- mongo("45588774", url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
+alldata <- dmd$find('{}')
+print(alldata)
+
+library(ggplot2)
+ggplot(alldata,aes(x=timestamp, y=temperatura))  + geom_point(aes(x=timestamp, y=temperatura, color=cut)) + geom_smooth()
+
+
+library(ggfortify)
+autoplot(alldata) + labs(title="Temperatura") 
+
+
+ggplot(alldata) +   geom_line(aes(x=timestamp,y=temperatura)) +   labs(title="Chart")
+
+_______________________________________________
+
+library(mongolite)
+dmd <- mongo("45588774", url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
+alldata <- dmd$find('{}')
+print(alldata)
+
+
+library(ggplot2)
+library(scales) # per date_format
+
+# converte i timestamp in orario leggibile
+alldata$timestamp <- as.POSIXct(as.numeric(as.character(alldata$timestamp)), origin="1970-01-01", tz="Etc/GMT+1")
+
+#PLOT
+ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) + geom_line(size=1) + ylim(-26,-16) + scale_x_datetime(labels = date_format("%Y-%m-%d  %H:%M")) + theme(axis.text.x = element_text(angle = 90, vjust=0.5),panel.grid.minor = element_blank())
+
+
