@@ -23,6 +23,7 @@ alldata$timestamp <- as.POSIXct(as.numeric(as.character(alldata$timestamp)), ori
 
 alertdata <- subset(alldata, as.numeric(temperatura) > -19.5)
 
+
 p <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   geom_line(size=0.8, colour = "black") +
   ylim(-26,-16) +
@@ -31,15 +32,13 @@ p <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   vjust = 1.5, hjust = 1,  aes(label=as.numeric(temperatura), size=1), span=50)     +
   stat_peaks(colour = "orange",span=50, size=2)     +
   stat_peaks(geom = "text", angle =45, col="red",
-  vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura), size=1), span=50)  +
-  geom_point(data=alertdata, aes(x=timestamp, y=as.numeric(temperatura)), colour="red", size=5)
-
-  if(length(alertdata)>0){ 
-   print(alertdata)
-   p+
-    geom_text(angle =45, col="red", data= alertdata,
-  vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura)))
-  }
+  vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura), size=1), span=50) 
+  
+if(nrow(alertdata)> 0){ 
+  p+
+  geom_point(data=alertdata, aes(x=timestamp, y=as.numeric(temperatura)), colour="red", size=5)+
+  geom_text(angle =45, col="red", data= alertdata, vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura)))
+}
   p+
   geom_hline(yintercept=-18, colour="red", size=0.5)+
   labs(title = "Rivelazione Temperature\n", x = "Orario", y = "Temperatura", color = "Legend Title\n") +
