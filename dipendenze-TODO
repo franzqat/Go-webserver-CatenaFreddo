@@ -29,7 +29,7 @@ Store templates in tmpl/ and page data in data/ (refactor albero dei files)
 
 SCALA:
 Rimozione path assoluto configurazione scala sensore
-
+ARgomento con sensore id / come alternativa
 R:
 Disaccoppiare script
 Automatizzare running (sempre o a richiesta)
@@ -51,7 +51,12 @@ cd ..
 cd .\server\ 
 go install
 server
-_______________________________________________
+_________________
+SCALA:
+BUILD
+BUILD ARTIFACT
+BUILD
+______________________________
 
 R: Lancia script R-Handler
 
@@ -76,3 +81,4 @@ ggplot(alldata) +   geom_line(aes(x=timestamp,y=temperatura)) +   labs(title="Ch
 alldata <- dmd$find('{}')
 _______________________________________________
 
+ .\Rscript.exe --vanilla C:\Users\franz\go\src\webserver\R-Handler.R 100
