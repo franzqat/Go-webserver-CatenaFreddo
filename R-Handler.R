@@ -2,6 +2,7 @@ library(mongolite)
 library(ggplot2)
 library(scales) # per date_format
 library(ggpmisc)
+
 dmd <- mongo("45588774", url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
 
 alldata <- dmd$find(sort = '{"timestamp": -1}', limit = 100)
@@ -14,10 +15,9 @@ alldata$timestamp <- as.POSIXct(as.numeric(as.character(alldata$timestamp)), ori
 
 #PLOT
 alertdata <- subset(alldata, as.numeric(temperatura) > -19.5)
-plot1 <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
+ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   geom_line(size=0.8, colour = "black") +
-  ylim(-26,-16)    +
-
+  ylim(-26,-16) +
   stat_valleys(colour = "blue", span=50, size=2)       +
   stat_valleys(geom = "text", colour = "blue", angle = 45,
   vjust = 1.5, hjust = 1,  aes(label=as.numeric(temperatura), size=1), span=50)     +
@@ -34,6 +34,6 @@ plot1 <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   axis.text.y = element_text(size = 14), axis.title.y = element_text(size = 16),
   plot.title = element_text(size = 20, face = "bold", color = "darkgreen")) +
   theme(legend.position="topright")+
-  scale_x_datetime(labels = date_format("%m-%d  %H:%M")) + theme(axis.text.x = element_text(angle = 0, vjust=0.5, size=10),panel.grid.minor = element_blank())
-plot(plot1)
-ggsave("res/myggplot.jpg", plot=plot1 )  # save a stored ggplot
+  scale_x_datetime(labels = date_format("%m-%d  %H:%M")) +
+  theme(axis.text.x = element_text(angle = 0, vjust=0.5, size=10),panel.grid.minor = element_blank())
+ggsave("myggplot.jpg")  # save a stored ggplot
