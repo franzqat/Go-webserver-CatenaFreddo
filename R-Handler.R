@@ -1,14 +1,19 @@
+args = commandArgs(trailingOnly=TRUE)
+if (length(args)==0) {
+  stop("Inserisci come argomento l'id del sensore", call.=FALSE)
+}
+
 library(mongolite)
 library(ggplot2)
 library(scales) # per date_format
 library(ggpmisc)
 library(Cairo)
-CairoWin()
-dmd <- mongo("45588774", url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
-
+options(device="CairoWin")
+dmd <- mongo(args[1], url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
+#45588774
 alldata <- dmd$find(sort = '{"timestamp": -1}', limit = 100)
 
-#print(alldata)
+print(alldata)
 
 
 # converte i timestamp in orario leggibile
@@ -28,8 +33,8 @@ ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   stat_peaks(geom = "text", angle =45, col="red",
   vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura), size=1), span=50)  +
   geom_point(data=alertdata, aes(x=timestamp, y=as.numeric(temperatura)), colour="red", size=5) +
-  geom_text(angle =45, col="red", data= alertdata,
-  vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura))) +
+  if(length(alertdata)>0)geom_text(angle =45, col="red", data= alertdata,
+  vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura)))+
   geom_hline(yintercept=-18, colour="red", size=0.5)+
   labs(title = "Rivelazione Temperature\n", x = "Orario", y = "Temperatura", color = "Legend Title\n") +
   theme_bw() +
