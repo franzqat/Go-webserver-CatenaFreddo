@@ -2,7 +2,8 @@ library(mongolite)
 library(ggplot2)
 library(scales) # per date_format
 library(ggpmisc)
-
+library(Cairo)
+CairoWin()
 dmd <- mongo("45588774", url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
 
 alldata <- dmd$find(sort = '{"timestamp": -1}', limit = 100)
@@ -14,7 +15,9 @@ alldata <- dmd$find(sort = '{"timestamp": -1}', limit = 100)
 alldata$timestamp <- as.POSIXct(as.numeric(as.character(alldata$timestamp)), origin="1970-01-01", tz="Etc/GMT+1")
 
 #PLOT
+
 alertdata <- subset(alldata, as.numeric(temperatura) > -19.5)
+
 ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   geom_line(size=0.8, colour = "black") +
   ylim(-26,-16) +
@@ -36,4 +39,7 @@ ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   theme(legend.position="topright")+
   scale_x_datetime(labels = date_format("%m-%d  %H:%M")) +
   theme(axis.text.x = element_text(angle = 0, vjust=0.5, size=10),panel.grid.minor = element_blank())
-ggsave("myggplot.jpg")  # save a stored ggplot
+  ggsave(filename = "D://magistrale/example1.jpg", type="cairo", width=5, height=5, units="in", dpi=150)
+  q()
+
+
