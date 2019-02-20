@@ -2,7 +2,10 @@ args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
   stop("Inserisci come argomento l'id del sensore", call.=FALSE)
 }
+
+#path <- paste("D://magistrale/example1.jpg", sep="")
 path <- paste("C://Users/franz/go/src/webserver/server/sensori/",args[1],"/",args[1],".jpg", sep="")
+
 library(mongolite)
 library(ggplot2)
 library(scales) # per date_format
@@ -48,7 +51,7 @@ if(nrow(alertdata)> 0){
   geom_text(angle =45, col="red", data= alertdata, vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura)))
 }
  
-  ggsave(filename = path, type="cairo", width=5, height=5, units="in", dpi=150)
+  ggsave(filename = path, type="cairo", width=10, height=10, units="in", dpi=150)
   q()
 
 
