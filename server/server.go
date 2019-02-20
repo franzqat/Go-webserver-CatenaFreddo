@@ -9,6 +9,7 @@ import (
 	"errors"
 	_ "fmt"
     "webserver/mongo"
+    "os"
 )
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
@@ -19,9 +20,11 @@ type Page struct {
 }
 
 func (p *Page) save() error {
-    filename := p.Title + ".txt"
+    filename := p.Title + ".jpg"
+    var percorso = "sensori/" 
     //The octal integer literal 0600, passed as the third parameter to WriteFile, indicates that the file should be created with read-write permissions for the current user only
-    return ioutil.WriteFile(filename, p.Body, 0600)
+    os.MkdirAll(percorso+p.Title, os.FileMode(0522))
+    return ioutil.WriteFile(percorso+p.Title+"/"+filename, p.Body, 0600)
 }
 
 func loadPage(title string) (*Page,error) {
@@ -71,18 +74,10 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
     body := r.FormValue("body")
     r.ParseForm()
+
     println(r.Form.Get("Device Id"))
-
-  //  for key,value := range r.Form {
-
-//    fmt.Println("%s = %s ", key, value) 
-
     mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("timestamp"),r.Form.Get("temperatura") , Client)
-/*
-"Device Id" -> deviceId, "temperatura" -> temperatura.toString,
- "timpestamp" -> timestamp.toString)
 
-    }*/
     p := &Page{Title: title, Body: []byte(body)}
     err := p.save()
     if err != nil {
@@ -113,10 +108,3 @@ func makeHandler(fn func (http.ResponseWriter, *http.Request, string)) http.Hand
         fn(w, r, m[2])
 	}
 }
-
-
-/*
-    mongo.ConnectToMongo()
-    mongo.Disconnect()
-    mongo.PostTemperature(sensorID, timestamp, temperature)
-*/

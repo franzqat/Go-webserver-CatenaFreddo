@@ -2,7 +2,7 @@ args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
   stop("Inserisci come argomento l'id del sensore", call.=FALSE)
 }
-
+path <- paste("C://Users/franz/go/src/webserver/server/sensori/",args[1],"/",args[1],".jpg", sep="")
 library(mongolite)
 library(ggplot2)
 library(scales) # per date_format
@@ -32,14 +32,7 @@ p <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   vjust = 1.5, hjust = 1,  aes(label=as.numeric(temperatura), size=1), span=50)     +
   stat_peaks(colour = "orange",span=50, size=2)     +
   stat_peaks(geom = "text", angle =45, col="red",
-  vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura), size=1), span=50) 
-  
-if(nrow(alertdata)> 0){ 
-  p+
-  geom_point(data=alertdata, aes(x=timestamp, y=as.numeric(temperatura)), colour="red", size=5)+
-  geom_text(angle =45, col="red", data= alertdata, vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura)))
-}
-  p+
+  vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura), size=1), span=50) +
   geom_hline(yintercept=-18, colour="red", size=0.5)+
   labs(title = "Rivelazione Temperature\n", x = "Orario", y = "Temperatura", color = "Legend Title\n") +
   theme_bw() +
@@ -49,7 +42,13 @@ if(nrow(alertdata)> 0){
   theme(legend.position="topright")+
   scale_x_datetime(labels = date_format("%m-%d  %H:%M")) +
   theme(axis.text.x = element_text(angle = 0, vjust=0.5, size=10),panel.grid.minor = element_blank())
-  ggsave(filename = "D://magistrale/example1.jpg", type="cairo", width=5, height=5, units="in", dpi=150)
+if(nrow(alertdata)> 0){ 
+  p+
+  geom_point(data=alertdata, aes(x=timestamp, y=as.numeric(temperatura)), colour="red", size=5)+
+  geom_text(angle =45, col="red", data= alertdata, vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura)))
+}
+ 
+  ggsave(filename = path, type="cairo", width=5, height=5, units="in", dpi=150)
   q()
 
 
