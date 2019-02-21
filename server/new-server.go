@@ -15,20 +15,11 @@ import (
 )  
 
 //Create a struct that holds information to be displayed in our HTML file
-type Welcome struct {
-   Name string
-   Time string
-}
 
 type Page struct {
     Title string
-    Body  []byte //https://blog.golang.org/go-slices-usage-and-internals
+    Body  []byte
 }
-
-type Sensore struct{
-  Body string
-}
-
 
 var Client = mongo.ConnectToMongo()
 
@@ -40,7 +31,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
     t, _ := template.ParseFiles("body.html")
     t.Execute(w, "Body: Hi this is my body")
 }*/
-
 
 
 //Go application entrypoint
@@ -60,7 +50,6 @@ func main() {
    })
 */
 
-
    fmt.Println("Listening")
    http.Handle("/", http.FileServer(http.Dir(*root)))
    http.HandleFunc("/save/", saveHandler)
@@ -78,7 +67,7 @@ func main() {
 
 func saveHandler(w http.ResponseWriter, r *http.Request,) {
 
-    body := r.FormValue("body")
+    body := r.FormValue("body") // al momento è vuoto
     r.ParseForm()
 
     println(r.Form.Get("Device Id"))
@@ -93,7 +82,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request,) {
       return
     }
     aggiornaTabellaR(r.Form.Get("Device Id"))
-    
+
     http.Redirect(w, r, "/sensori/"+r.Form.Get("Device Id"), http.StatusFound)
 
 }
@@ -108,8 +97,8 @@ func (p *Page) save() error {
     //The octal integer literal 0600, passed as the third parameter to WriteFile, indicates that the file should be created with read-write permissions for the current user only
     os.MkdirAll(percorso+p.Title, os.FileMode(0522))
 
-    //TODO: controllare se esiste il jpg, in caso contrario crearlo
-    //creare index se non esiste
+    //controlla se esiste il jpg, in caso contrario crearlo
+    
     if _, err := os.Stat(percorso+p.Title+"/"+filenameJpg); err == nil {
       //il file esiste
       
@@ -119,14 +108,11 @@ func (p *Page) save() error {
     } else {
       return err
     }
-
+    
     if _, err := os.Stat(percorso+p.Title+"/"+index); err == nil {
       //il file esiste
-      
     } else if os.IsNotExist(err) {
-      // path/to/whatever does *not* exist
-
-
+    //creare index se non esiste
       ioutil.WriteFile(percorso+p.Title+"/"+index, nil, 0600)
     } else {
       return err

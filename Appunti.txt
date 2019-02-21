@@ -1,3 +1,42 @@
+DOMANDE E COMMENTI
+Ci sono cose hardcoded: 
+	path dove R salva jpg
+	la temperatura massima in R
+	GO: path di esecuzione script per lanciare R
+	Scala: url per la post
+	Il tempo di ciclo del sensore
+
+SCALA
+Usiamo la gaussiana e dobbiamo cambiare la distribuzione usando un processo markoviano
+Scala fa la post al server GO
+
+eseguiamo il jar da linea di comando specificando l'id
+Go esegue lo script di R da linea di comando specificando l'id
+
+
+
+Optimal PATH:
+Premesse: 
+	Il server è attivo e in ascolto
+	Il database MongoDB è attivo
+	
+1. Il sensore periodicamente invia il valore di temperatura [simulato], il timestamp e il proprio ID attraverso una chiamata POST al server GO
+2. Il server riceve la POST e: 
+	2.1. Inserisce i dati nel database MongoDB nella collezione corrispondente all'ID
+	2.2. Crea, se non esistono, le cartelle e i files associati al sensore con quell'ID
+	2.3. Esegue lo script di R associato all'ID
+3. R elabora i dati e genera il jpg corrispondente e lo conserva nella cartella del server associata all'ID del sensore
+
+Dal punto di vista dell'utente:
+L'utente accede alla pagina localhost:8080 dove trova un elenco di links chiamate con l'ID del sensore.
+I link portano ad una pagina contente l'immagine plottata.
+
+	
+
+
+
+DIPENDENZE
+
 GO
 https://github.com/mongodb/mongo-go-driver
 github.com/julienschmidt/httprouter
@@ -23,7 +62,6 @@ GO:
 Scrivere contenuto index
 Gestione allarmi
 Pulizia e creazione interfaccia web
-
 
 Store templates in tmpl/ and page data in data/ (refactor albero dei files)
 

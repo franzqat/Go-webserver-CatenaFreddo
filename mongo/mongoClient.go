@@ -7,7 +7,6 @@ import (
 
     _ "github.com/mongodb/mongo-go-driver/bson"
     "github.com/mongodb/mongo-go-driver/mongo"
-  //  "github.com/mongodb/mongo-go-driver/mongo/options"
 )
 
 type Messaggio struct {
@@ -17,9 +16,6 @@ type Messaggio struct {
 
 
 func ConnectToMongo() (*mongo.Client) {
-
-    // Rest of the code will go here
-    //mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb
     //"mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true"
     Client, err := mongo.Connect(context.TODO(), "mongodb://127.0.0.1:27017/admin")
 
@@ -53,26 +49,6 @@ func PostTemperature(sensorID string, timestamp string, temperature string, Clie
     fmt.Println("Inserted a single document: ", insertResult.InsertedID)
     }
 }
-
-/*
-func Get(sensorID string){
-    filter := bson.D{{"name", "Misty"}}
-    collection := client.Database("test").Collection(sensorID)
-    /**
-    * GET
-    */
-    // create a value into which the result can be decoded
- /*   var result Messaggio
-
-    err = collection.FindOne(context.TODO(), filter).Decode(&result)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    fmt.Printf("Found a single document: %+v\n", result)
-
-*/
-
 func Disconnect(Client *mongo.Client){
     err := Client.Disconnect(context.TODO())
 

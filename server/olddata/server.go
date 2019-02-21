@@ -11,7 +11,7 @@ import (
     "webserver/mongo"
     "os"
 )
-var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")   "/([0-9]+)"
 var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
 
 type Page struct {

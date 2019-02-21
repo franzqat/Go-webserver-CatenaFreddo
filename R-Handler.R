@@ -4,32 +4,36 @@ if (length(args)==0) {
 }
 
 #path <- paste("D://magistrale/example1.jpg", sep="")
+#path hardcoded
 path <- paste("C://Users/franz/go/src/webserver/server/sensori/",args[1],"/",args[1],".jpg", sep="")
 
-library(mongolite)
-library(ggplot2)
+library(mongolite) #libreria per mongo
+library(ggplot2) #libreria per plot
 library(scales) # per date_format
-library(ggpmisc)
-library(Cairo)
-options(device="CairoWin")
-#test è il nome del db
-dmd <- mongo(args[1], url = "mongodb://127.0.0.1:27017/test")
-#dmd <- mongo(args[1], url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
-#45588774
-alldata <- dmd$find(sort = '{"timestamp": -1}', limit = 100)
+library(ggpmisc) #per plot picchi e valli
 
- #print(alldata)
-# Automatically disconnect when connection is removed
-rm(dmd)
+library(Cairo) #libreria grafica anti aliasing
+options(device="CairoWin")
+
+#test è il nome del db
+connessioneMongo <- mongo(args[1], url = "mongodb://127.0.0.1:27017/test")
+#connessioneMongo <- mongo(args[1], url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")  #vecchia stringa x cloud
+
+#ad all data sono assegnati gli ultimi 100 valori ordinati per timestamp in ordine crescente
+alldata <- connessioneMongo$find(sort = '{"timestamp": -1}', limit = 100)
+
+#print(alldata)
+
+# La rimozione dell'elemento effettua automaticamente la disconnessione da mongo
+rm(connessioneMongo)
 
 # converte i timestamp in orario leggibile
 alldata$timestamp <- as.POSIXct(as.numeric(as.character(alldata$timestamp)), origin="1970-01-01", tz="Etc/GMT+1")
 
-#PLOT
-
+#Subset di warning, -18 è la temp corretta
 alertdata <- subset(alldata, as.numeric(temperatura) > -19.5)
 
-
+#PLOT
 p <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   geom_line(size=0.8, colour = "black") +
   ylim(-26,-16) +
@@ -48,12 +52,13 @@ p <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
   theme(legend.position="topright")+
   scale_x_datetime(labels = date_format("%m-%d  %H:%M")) +
   theme(axis.text.x = element_text(angle = 0, vjust=0.5, size=10),panel.grid.minor = element_blank())
+#Se entra nell'if ci sono dei valori critici che vengono evidenziati nel plot
 if(nrow(alertdata)> 0){ 
   p+
   geom_point(data=alertdata, aes(x=timestamp, y=as.numeric(temperatura)), colour="red", size=5)+
   geom_text(angle =45, col="red", data= alertdata, vjust = -0.5, hjust = -0.4, aes(label=as.numeric(temperatura)))
 }
- 
+  #salvataggio del plot in formato jpg
   ggsave(filename = path, type="cairo", width=10, height=10, units="in", dpi=150)
 
   q()
