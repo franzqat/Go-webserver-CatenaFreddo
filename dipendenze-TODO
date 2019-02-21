@@ -30,7 +30,7 @@ Store templates in tmpl/ and page data in data/ (refactor albero dei files)
 SCALA:
 Ottimizzare distribuzione con processo markoviano
 R:
-Automatizzare running (sempre o a richiesta) - magari tramite comando da GO?
+
 _______________________________________________
 
 DONE:
@@ -44,6 +44,11 @@ scala argomento con deviceid
 R legge mongo
 R salva immagine
 R Disaccoppiare script
+R Automatizzare running (sempre ad ogni post)
+R 
+
+MONGO
+Migrato in locale
 _______________________________________________
 
 Compila GO

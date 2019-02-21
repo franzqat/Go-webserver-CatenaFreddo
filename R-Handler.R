@@ -12,12 +12,15 @@ library(scales) # per date_format
 library(ggpmisc)
 library(Cairo)
 options(device="CairoWin")
-dmd <- mongo(args[1], url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
+#test è il nome del db
+dmd <- mongo(args[1], url = "mongodb://127.0.0.1:27017/test")
+#dmd <- mongo(args[1], url = "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
 #45588774
 alldata <- dmd$find(sort = '{"timestamp": -1}', limit = 100)
 
  #print(alldata)
-
+# Automatically disconnect when connection is removed
+rm(dmd)
 
 # converte i timestamp in orario leggibile
 alldata$timestamp <- as.POSIXct(as.numeric(as.character(alldata$timestamp)), origin="1970-01-01", tz="Etc/GMT+1")
@@ -52,6 +55,7 @@ if(nrow(alertdata)> 0){
 }
  
   ggsave(filename = path, type="cairo", width=10, height=10, units="in", dpi=150)
+
   q()
 
 

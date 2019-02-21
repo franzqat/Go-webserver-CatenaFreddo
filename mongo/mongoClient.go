@@ -19,7 +19,9 @@ type Messaggio struct {
 func ConnectToMongo() (*mongo.Client) {
 
     // Rest of the code will go here
-    Client, err := mongo.Connect(context.TODO(), "mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true")
+    //mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb
+    //"mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true"
+    Client, err := mongo.Connect(context.TODO(), "mongodb://127.0.0.1:27017/admin")
 
     if err != nil {
         log.Fatal(err)
