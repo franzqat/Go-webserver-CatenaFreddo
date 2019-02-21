@@ -1,6 +1,6 @@
 GO
 https://github.com/mongodb/mongo-go-driver
-
+github.com/julienschmidt/httprouter
 R
 https://jeroen.github.io/mongolite/
 install.packages("mongolite")
@@ -20,27 +20,28 @@ _______________________________________________
 TODO:
 
 GO:
-Associazione e creazione pagine web per le immagini trovate e i rispettivi sensori
+Riprendere dal MVC lasciato in sospeso coi gattini
+creazione pagine web per le immagini trovate e i rispettivi sensori
 Root con link a tutti i sensori noti /frontpage
-Pagina View del sensore contiene jpg
 Pulizia e creazione interfaccia web
 Gestione allarmi
+
 Store templates in tmpl/ and page data in data/ (refactor albero dei files)
 
 SCALA:
-Rimozione path assoluto configurazione scala sensore
-ARgomento con sensore id / come alternativa
+Ottimizzare distribuzione con processo markoviano
 R:
-Disaccoppiare script
-Automatizzare running (sempre o a richiesta)
+Automatizzare running (sempre o a richiesta) - magari tramite comando da GO?
 _______________________________________________
 
 DONE:
 Connettere mongo a go 
 accoppaire post a query di mongo X
 BONUS: jar di scala eseguibile
+scala argomento con deviceid
 R legge mongo
 R salva immagine
+R Disaccoppiare script
 _______________________________________________
 
 Compila GO
