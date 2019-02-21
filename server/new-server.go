@@ -5,7 +5,7 @@ import (
       "net/http"
      "fmt"
      _ "time"
-     _ "html/template"
+      "html/template"
       "flag"
         "webserver/mongo"
   "io/ioutil"
@@ -25,15 +25,18 @@ type Page struct {
 var Client = mongo.ConnectToMongo()
 
 
+var base = template.Must(template.New("base").Parse("header\n{{template \"content\"}}\nfooter"))
+//var content1 = template.Must(template.Must(base.Clone()).Parse(`{{define "content"}}<img src="`+ r.Form.Get("Device Id") + `.jpg" width="600" height="600" alt="My Pic">{{end}}`))
+
+
 //Go application entrypoint
 func main() {
    var root = flag.String("root", "./sensori" , "file system path")
 
    fmt.Println("Listening")
    http.Handle("/", http.FileServer(http.Dir(*root)))
-
- http.HandleFunc("/save/", saveHandler)
-
+   http.HandleFunc("/save/", saveHandler)
+   
    http.ListenAndServe(":8080", nil)
 }
 
@@ -54,6 +57,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request,) {
     }
     http.Redirect(w, r, "/sensori/"+r.Form.Get("Device Id"), http.StatusFound)
 }
+
 
 func (p *Page) save() error {
     filenameJpg := p.Title + ".jpg"
@@ -81,9 +85,12 @@ func (p *Page) save() error {
       
     } else if os.IsNotExist(err) {
       // path/to/whatever does *not* exist
-      ioutil.WriteFile(percorso+p.Title+"/"+index, p.Body, 0600)
+
+
+      ioutil.WriteFile(percorso+p.Title+"/"+index, nil, 0600)
     } else {
       return err
     }
     return nil
 }
+
