@@ -56,9 +56,34 @@ func saveHandler(w http.ResponseWriter, r *http.Request,) {
 }
 
 func (p *Page) save() error {
-    filename := p.Title + ".jpg"
+    filenameJpg := p.Title + ".jpg"
+    index := "index.html"
+
     var percorso = "sensori/" 
+
     //The octal integer literal 0600, passed as the third parameter to WriteFile, indicates that the file should be created with read-write permissions for the current user only
     os.MkdirAll(percorso+p.Title, os.FileMode(0522))
-    return ioutil.WriteFile(percorso+p.Title+"/"+filename, p.Body, 0600)
+
+    //TODO: controllare se esiste il jpg, in caso contrario crearlo
+    //creare index se non esiste
+    if _, err := os.Stat(percorso+p.Title+"/"+filenameJpg); err == nil {
+      //il file esiste
+      
+    } else if os.IsNotExist(err) {
+      // path/to/whatever does *not* exist
+      ioutil.WriteFile(percorso+p.Title+"/"+filenameJpg, p.Body, 0600)
+    } else {
+      return err
+    }
+
+    if _, err := os.Stat(percorso+p.Title+"/"+index); err == nil {
+      //il file esiste
+      
+    } else if os.IsNotExist(err) {
+      // path/to/whatever does *not* exist
+      ioutil.WriteFile(percorso+p.Title+"/"+index, p.Body, 0600)
+    } else {
+      return err
+    }
+    return nil
 }
