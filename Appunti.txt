@@ -19,6 +19,7 @@ Optimal PATH:
 Premesse: 
 	Il server è attivo e in ascolto
 	Il database MongoDB è attivo
+	L'id dei sensori è univoco
 	
 1. Il sensore periodicamente invia il valore di temperatura [simulato], il timestamp e il proprio ID attraverso una chiamata POST al server GO
 2. Il server riceve la POST e: 

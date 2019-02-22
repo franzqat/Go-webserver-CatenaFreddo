@@ -35,11 +35,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 //Go application entrypoint
 func main() {
-   var root = flag.String("root", "./sensori" , "file system path")
+   var root = flag.String("root", "./" , "file system path")
    
  // templates := template.Must(template.ParseFiles("templates/body.html"))
-
-  http.Handle("/front", http.FileServer(http.Dir("sensori"))) 
 
 /*
   http.HandleFunc("/sensori/" , func(w http.ResponseWriter, r *http.Request, deviceid string) {
@@ -49,16 +47,12 @@ func main() {
       }
    })
 */
-
+   generaFrontIndex()
    fmt.Println("Listening")
+
    http.Handle("/", http.FileServer(http.Dir(*root)))
    http.HandleFunc("/save/", saveHandler)
 
-   // fs := http.FileServer(http.Dir("./sensori"))
-
-  //  http.HandleFunc("/sensori",handler)
-
-  //  http.Handle("/front", adaptFileServer(fs))
 
 
    http.ListenAndServe(":8080", nil)
@@ -81,7 +75,9 @@ func saveHandler(w http.ResponseWriter, r *http.Request,) {
       http.Error(w, err.Error(), http.StatusInternalServerError)
       return
     }
+
     aggiornaTabellaR(r.Form.Get("Device Id"))
+
 
     http.Redirect(w, r, "/sensori/"+r.Form.Get("Device Id"), http.StatusFound)
 
@@ -104,7 +100,11 @@ func (p *Page) save() error {
       
     } else if os.IsNotExist(err) {
       // path/to/whatever does *not* exist
+
       ioutil.WriteFile(percorso+p.Title+"/"+filenameJpg, p.Body, 0600)
+      
+      generaFrontIndex()
+
     } else {
       return err
     }
@@ -113,7 +113,14 @@ func (p *Page) save() error {
       //il file esiste
     } else if os.IsNotExist(err) {
     //creare index se non esiste
-      ioutil.WriteFile(percorso+p.Title+"/"+index, nil, 0600)
+      bodyindex := `
+      <!DOCTYPE html>
+      <body>
+      <h1>Sensore` +  p.Title + `</h1> 
+      <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p>
+      <img src="` + p.Title+ `.jpg" width="600" height="600">
+      </body>`
+      ioutil.WriteFile(percorso+p.Title+"/"+index, []byte(bodyindex), 0600)
     } else {
       return err
     }
@@ -126,4 +133,29 @@ func aggiornaTabellaR(id string) {
     log.Fatal(err)
   }
 
+}
+
+func generaFrontIndex(){
+    println("Front index generato")
+   files, err := ioutil.ReadDir("./sensori/")
+    if err != nil {
+        log.Fatal(err)
+    }
+    indirizzi :=""
+    for _, f := range files {
+     indirizzi += `<p> <a href="http://localhost:8080/sensori/`+ f.Name() + `/" > Sensore #`+ f.Name()  +`</a>  </p>
+     `
+    }
+
+      if _, err := os.Stat("./index.html"); err == nil {
+        //il file esiste
+        bodyindex := `
+        <!DOCTYPE html>
+        <body>
+        <h1>Frontpage</h1>`+ indirizzi  +`
+        </body>`
+        ioutil.WriteFile("./index.html", []byte(bodyindex), 0600)
+      } else {
+        log.Fatal(err)
+      }
 }
