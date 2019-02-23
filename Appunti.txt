@@ -1,7 +1,7 @@
 DOMANDE E COMMENTI
 Ci sono cose hardcoded: 
-	path dove R salva jpg
-	la temperatura massima in R
+	path (al server) dove R salva jpg
+	la temperatura critica in R 
 	GO: path di esecuzione script per lanciare R
 	Scala: url per la post
 	Il tempo di ciclo del sensore
@@ -60,15 +60,23 @@ _______________________________________________
 TODO:
 
 GO:
-Scrivere contenuto index
+Migliorare contenuto index
 Gestione allarmi
-Pulizia e creazione interfaccia web
-
-Store templates in tmpl/ and page data in data/ (refactor albero dei files)
+Post con valori offline (ultimo ts noto, ts attuale e quante volte il valore critico è stato superato durante  )
+Aggiungere contatore di warning su mongo e modificare tutte le post d iconseguenza
 
 SCALA:
-Ottimizzare distribuzione con processo markoviano
+Rendere il sensore più smart.
+	Controllo dei valori e se sono costanti ridurre le post
+	Sistemare FSM (+ stato tentativo)
+	Conta i warn
+Migliorare il file di configurazione
+	path relativo
+	piu informazioni 
+	(creazione file di default)
 R:
+
+Mongo
 
 _______________________________________________
 
@@ -85,6 +93,9 @@ R salva immagine
 R Disaccoppiare script
 R Automatizzare running (sempre ad ogni post)
 R 
+
+SCALA 
+Ottimizzare distribuzione con processo markoviano - come se fosse
 
 MONGO
 Migrato in locale
