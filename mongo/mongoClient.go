@@ -12,6 +12,7 @@ import (
 type Messaggio struct {
     Timestamp  string
     Temperatura string
+    Warning string
 }
 
 
@@ -34,21 +35,22 @@ func ConnectToMongo() (*mongo.Client) {
     return Client
 }
 
-func PostTemperature(sensorID string, timestamp string, temperature string, Client *mongo.Client) {
-
+func PostTemperature(sensorID string, timestamp string, temperature string, warning string, Client *mongo.Client) {
 
     collection := Client.Database("test").Collection(sensorID)
 
 
-    msg := Messaggio{timestamp, temperature}
+    msg := Messaggio{timestamp, temperature,warning}
     //POST al database
     insertResult, err := collection.InsertOne(context.TODO(), msg)
     if err != nil {
         log.Fatal(err)
     } else {
-    fmt.Println("Inserted a single document: ", insertResult.InsertedID)
+    fmt.Println("Inserted a single document: ",  insertResult.InsertedID, msg.Warning)
     }
 }
+
+
 func Disconnect(Client *mongo.Client){
     err := Client.Disconnect(context.TODO())
 

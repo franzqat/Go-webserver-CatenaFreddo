@@ -64,9 +64,8 @@ func saveHandler(w http.ResponseWriter, r *http.Request,) {
     body := r.FormValue("body") // al momento è vuoto
     r.ParseForm()
 
-    println(r.Form.Get("Device Id"))
-    mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("timestamp"),r.Form.Get("temperatura") , Client)
-    
+    println("Ricevuto dato da: "+r.Form.Get("Device Id") + " Warning:" +  r.Form.Get("warning"))
+    mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("timestamp"),r.Form.Get("temperatura"), r.Form.Get("warning") , Client)
     
 
     p := &Page{Title: r.Form.Get("Device Id"), Body: []byte(body)}

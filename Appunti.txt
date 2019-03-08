@@ -62,18 +62,13 @@ TODO:
 GO:
 Migliorare contenuto index
 Gestione allarmi
-Post con valori offline (ultimo ts noto, ts attuale e quante volte il valore critico è stato superato durante  )
-Aggiungere contatore di warning su mongo e modificare tutte le post d iconseguenza
+Verificare il numero di warning nell'index
+
 
 SCALA:
-Rendere il sensore più smart.
-	Controllo dei valori e se sono costanti ridurre le post
-	Sistemare FSM (+ stato tentativo)
-	Conta i warn
-Migliorare il file di configurazione
-	path relativo
-	piu informazioni 
-	(creazione file di default)
+Sistemare FSM (+ stato tentativo)
+	
+
 R:
 
 Mongo
@@ -84,18 +79,29 @@ DONE:
 Connettere mongo a go 
 accoppaire post a query di mongo X
 GO creazione pagine web per le immagini trovate e i rispettivi sensori X la creazione avviene durante la post
+Aggiungere contatore di warning su mongo e modificare tutte le post di conseguenza
 
 Root con link a tutti i sensori noti /frontpage
-BONUS: jar di scala eseguibile
-scala argomento con deviceid
+Fixato la post con il warning
+
 R legge mongo
 R salva immagine
 R Disaccoppiare script
 R Automatizzare running (sempre ad ogni post)
-R 
+
 
 SCALA 
+BONUS: jar di scala eseguibile
+scala argomento con deviceid
 Ottimizzare distribuzione con processo markoviano - come se fosse
+Migliorare il file di configurazione
+	path relativo
+	piu informazioni 
+	(creazione file di default)
+
+Rendere il sensore più smart.
+	Controllo dei valori e se sono costanti ridurre le post
+Conta i warn -> è diventato un buffer circolare per archiviare i warning quando è offline e inviarli quando si ritorna online
 
 MONGO
 Migrato in locale
@@ -107,8 +113,8 @@ cd webserver\mongo
 go build
 cd ..
 cd .\server\ 
-go install
-server
+go install .\new-server.go
+new-server
 _________________
 SCALA:
 BUILD
