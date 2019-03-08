@@ -5,8 +5,9 @@ import (
     "fmt"
     "log"
 
-    _ "github.com/mongodb/mongo-go-driver/bson"
+    "github.com/mongodb/mongo-go-driver/bson"
     "github.com/mongodb/mongo-go-driver/mongo"
+    "github.com/mongodb/mongo-go-driver/mongo/options"
 )
 
 type Messaggio struct {
@@ -34,6 +35,50 @@ func ConnectToMongo() (*mongo.Client) {
     fmt.Println("Connected to MongoDB!")
     return Client
 }
+
+
+func GetWarnings(sensorID string, Client *mongo.Client) string {
+    // Pass these options to the Find method
+  findOptions := options.Find()
+  findOptions.SetLimit(50)
+
+  collection := Client.Database("test").Collection(sensorID)
+
+  filter := bson.D{{"warning", "1"}}
+
+  // Here's an array in which you can store the decoded documents
+  var results []*Messaggio
+
+  // Passing nil as the filter matches all documents in the collection
+  cur, err := collection.Find(context.TODO(), filter, findOptions)
+
+  if err != nil {
+      log.Fatal(err)
+  }
+
+  // Finding multiple documents returns a cursor
+  // Iterating through the cursor allows us to decode documents one at a time
+  for cur.Next(context.TODO()) {
+
+      // create a value into which the single document can be decoded
+      var elem Messaggio
+      err := cur.Decode(&elem)
+      if err != nil {
+          log.Fatal(err)
+      }
+      results = append(results, &elem)
+  }
+
+  if err := cur.Err(); err != nil {
+      log.Fatal(err)
+  }
+
+  // Close the cursor once finished
+  cur.Close(context.TODO())
+
+  return fmt.Sprintf("%d", len(results))  
+}
+
 
 func PostTemperature(sensorID string, timestamp string, temperature string, warning string, Client *mongo.Client) {
 

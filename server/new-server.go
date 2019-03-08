@@ -67,6 +67,9 @@ func saveHandler(w http.ResponseWriter, r *http.Request,) {
     println("Ricevuto dato da: "+r.Form.Get("Device Id") + " Warning:" +  r.Form.Get("warning"))
     mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("timestamp"),r.Form.Get("temperatura"), r.Form.Get("warning") , Client)
     
+    //if warning -> aggiorna indexhtml
+  
+
 
     p := &Page{Title: r.Form.Get("Device Id"), Body: []byte(body)}
     err := p.save()
@@ -77,10 +80,13 @@ func saveHandler(w http.ResponseWriter, r *http.Request,) {
 
     aggiornaTabellaR(r.Form.Get("Device Id"))
 
+    updateIndex(r.Form.Get("Device Id"))
 
     http.Redirect(w, r, "/sensori/"+r.Form.Get("Device Id"), http.StatusFound)
 
 }
+
+
 
 
 func (p *Page) save() error {
@@ -114,10 +120,16 @@ func (p *Page) save() error {
     //creare index se non esiste
       bodyindex := `
       <!DOCTYPE html>
+      <head>
+      <link rel="stylesheet" href="/static/stylesheets/template.css">
+      </head>
       <body>
-      <h1>Sensore` +  p.Title + `</h1> 
-      <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p>
-      <img src="` + p.Title+ `.jpg" width="600" height="600">
+      <div class="center"> <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p></div>
+
+      <div class="welcome center">Sensore` +  p.Title + `</div> 
+      <div>
+      <img class="center" src="` +  p.Title + `.jpg" width="600" height="600" />
+      </div>      
       </body>`
       ioutil.WriteFile(percorso+p.Title+"/"+index, []byte(bodyindex), 0600)
     } else {
@@ -136,7 +148,7 @@ func aggiornaTabellaR(id string) {
 
 func generaFrontIndex(){
     println("Front index generato")
-   files, err := ioutil.ReadDir("./sensori/")
+    files, err := ioutil.ReadDir("./sensori/")
     if err != nil {
         log.Fatal(err)
     }
@@ -150,11 +162,49 @@ func generaFrontIndex(){
         //il file esiste
         bodyindex := `
         <!DOCTYPE html>
+        <head>
+      <link rel="stylesheet" href="/static/stylesheets/template.css">
+      </head>
         <body>
-        <h1>Frontpage</h1>`+ indirizzi  +`
+        <div class="welcome center">Frontpage</div>`+ indirizzi  +`
         </body>`
         ioutil.WriteFile("./index.html", []byte(bodyindex), 0600)
       } else {
         log.Fatal(err)
       }
-}
+
+  }
+    func updateIndex(deviceID string) {
+    
+    
+    var numeroWarnings = mongo.GetWarnings(deviceID,Client)
+    var percorso = "sensori/"+deviceID
+
+      if _, err := os.Stat(percorso+"/index.html"); err == nil {
+        //il file esiste
+
+         bodyindex := `
+      <!DOCTYPE html>
+      <head>
+      <link rel="stylesheet" href="/static/stylesheets/template.css">
+      </head>
+      <body>
+      <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p>
+
+      <div class="welcome center">Sensore ` +  deviceID + `</div> `
+
+      if (numeroWarnings != "0") {
+        bodyindex+=`<h2>  <div class="center"> <font color="red"> Numero di warnings ` + numeroWarnings + `</font></div>  </h2> `
+      }
+      bodyindex+=`<div>
+                  <img class="center" src="` + deviceID + `.jpg" width="600" height="600" />
+                  </div>
+                  </body>`
+      println("Warning del sensore " + deviceID + " aggiornato")
+      ioutil.WriteFile(percorso+"/index.html", []byte(bodyindex), 0600)
+      } else {
+        log.Fatal(err)
+      }
+    }
+
+
