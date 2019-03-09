@@ -126,9 +126,10 @@ func scriviIndexSensore(deviceID string, path string, warnings string) {
   </head>
 
   <body> 
-  <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p><div class="welcome center">Sensore ` + deviceID + `</div>
-	<h2>  <div class="center"> <font color="red"> Numero di warnings ` + warnings + `</font></div>  </h2> 
+  <div class="welcome center">Sensore ` + deviceID + `</div>
+	<h2>  <div class="warning center">  Numero di warnings ` + warnings + `</font></div>  </h2> 
   <div><img class="center" src="` + deviceID + `.jpg" width="600" height="600" /> </div>      
+  <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p>
   </body>`
 
 	ioutil.WriteFile(path, []byte(bodyindex), 0600)
@@ -150,7 +151,7 @@ func creaFrontIndex() {
 	}
 	indirizzi := ""
 	for _, f := range files {
-		indirizzi += `<p> <a href="http://localhost:8080/sensori/` + f.Name() + `/" > Sensore #` + f.Name() + `</a>  </p>
+		indirizzi += `<li><a href="http://localhost:8080/sensori/` + f.Name() + `/" > Sensore #` + f.Name() + `</a></li>
      `
 	}
 
@@ -162,7 +163,9 @@ func creaFrontIndex() {
       <link rel="stylesheet" href="/static/stylesheets/template.css">
       </head>
         <body>
-        <div class="welcome center">Frontpage</div>` + indirizzi + `
+        <div class="welcome center titolo">Lista dei sensori di temperatura</div>
+        <ul>` + indirizzi + `
+        </ul>
         </body>`
 		ioutil.WriteFile("./index.html", []byte(bodyindex), 0600)
 		println("Front index creato")

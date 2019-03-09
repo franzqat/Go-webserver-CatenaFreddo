@@ -1,26 +1,65 @@
-﻿body  {
+﻿*{
+    box-sizing: border-box;
+}
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body  {
    min-height:100%;
    background-image: url("/static/stylesheets/background.jpg");
    background-blend-mode: overlay;
    background-size:cover
 }
+ul {
+  list-style-type: none;
+  margin-top: 1rem;
+  width: 200px;
+  background-color: inherit;
+}
 
+li a {
+  font-family: 'Segoe UI';
+  display: block;
+  color: #000;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color on hover */
+li a:hover {
+  background-color: #555;
+  color: white;
+}
+
+.titolo {
+  padding: 1rem;
+}
 .welcome {
    font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif';
    font-size: 3rem;
    color: black;
+   background-color: #555;
+   color: white;
+}
+
+.warning {
+ color: red;
+  font-family: 'Segoe UI'; 
+   padding: 1rem;
 }
 
 .center {
-   height: inherit;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-left: auto;
   margin-right: auto;
 
 }​
+
 
 .marginauto {
     margin: 10px auto 20px;
