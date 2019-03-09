@@ -62,8 +62,6 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	println("Ricevuto dato da: " + r.Form.Get("Device Id") + " Warning:" + r.Form.Get("warning"))
 	mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("timestamp"), r.Form.Get("temperatura"), r.Form.Get("warning"), Client)
 
-	//if warning -> aggiorna indexhtml
-
 	p := &Page{Title: r.Form.Get("Device Id"), Body: []byte(body)}
 	err := p.save()
 	if err != nil {
@@ -73,7 +71,10 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 
 	aggiornaTabellaR(r.Form.Get("Device Id"))
 
-	updateIndex(r.Form.Get("Device Id"))
+	//if warning -> aggiorna index
+	if r.Form.Get("warning") != "0" {
+		updateIndex(r.Form.Get("Device Id"))
+	}
 
 	http.Redirect(w, r, "/sensori/"+r.Form.Get("Device Id"), http.StatusFound)
 
@@ -88,28 +89,28 @@ func (p *Page) save() error {
 	//The octal integer literal 0600, passed as the third parameter to WriteFile, indicates that the file should be created with read-write permissions for the current user only
 	os.MkdirAll(percorso+p.Title, os.FileMode(0522))
 
-	//controlla se esiste il jpg, in caso contrario lo crea
+	//Controllo esistenza dei files se il sensore è nuovo
 	if _, err := os.Stat(percorso + p.Title + "/" + filenameJpg); err == nil {
 		//il file esiste
 		//non faccio nulla
 	} else if os.IsNotExist(err) {
-		//file non esiste
-
+		//il file jpg non esiste
+		//crea il jpg
 		ioutil.WriteFile(percorso+p.Title+"/"+filenameJpg, p.Body, 0600)
-
+		//crea l'index
 		creaFrontIndex()
 
 	} else {
 		return err
 	}
 
+	//se l'index del sensore non esiste
 	if _, err := os.Stat(percorso + p.Title + "/" + index); err == nil {
 		//il file esiste
 	} else if os.IsNotExist(err) {
 		//creare index se non esiste
-
-		bodyindex := scriviIndexSensore(p.Title)
-		ioutil.WriteFile(percorso+p.Title+"/"+index, []byte(bodyindex), 0600)
+    println("Creo l'index del sensore")
+		scriviIndexSensore(p.Title,percorso+p.Title+ "/" +index, "0")
 
 	} else {
 		return err
@@ -117,20 +118,20 @@ func (p *Page) save() error {
 	return nil
 }
 
-func scriviIndexSensore(deviceID string) string {
+func scriviIndexSensore(deviceID string, path string, warnings string) {
 	bodyindex := `
   <!DOCTYPE html>
   <head>
   <link rel="stylesheet" href="/static/stylesheets/template.css">
   </head>
 
-  <body>
-  <div class="center"> <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p></div>
-
-  <div class="welcome center">Sensore` + deviceID + `</div> 
+  <body> 
+  <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p><div class="welcome center">Sensore ` + deviceID + `</div>
+	<h2>  <div class="center"> <font color="red"> Numero di warnings ` + warnings + `</font></div>  </h2> 
   <div><img class="center" src="` + deviceID + `.jpg" width="600" height="600" /> </div>      
   </body>`
-	return bodyindex
+
+	ioutil.WriteFile(path, []byte(bodyindex), 0600)
 }
 
 func aggiornaTabellaR(id string) {
@@ -173,32 +174,11 @@ func creaFrontIndex() {
 func updateIndex(deviceID string) {
 
 	var numeroWarnings = mongo.GetWarnings(deviceID, Client)
-	var percorso = "sensori/" + deviceID
+	var path = "sensori/" + deviceID + "/index.html"
 
-	if _, err := os.Stat(percorso + "/index.html"); err == nil {
+	if _, err := os.Stat(path); err == nil {
 		//il file esiste
-
-		//TO Be updated??
-		bodyindex := `
-      <!DOCTYPE html>
-      <head>
-      <link rel="stylesheet" href="/static/stylesheets/template.css">
-      </head>
-      <body>
-      <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p>
-
-      <div class="welcome center">Sensore ` + deviceID + `</div> `
-
-		if numeroWarnings != "0" {
-			bodyindex += `<h2>  <div class="center"> <font color="red"> Numero di warnings ` + numeroWarnings + `</font></div>  </h2> `
-		}
-		bodyindex += `<div>
-                  <img class="center" src="` + deviceID + `.jpg" width="600" height="600" />
-                  </div>
-                  </body>`
-
-		ioutil.WriteFile(percorso+"/index.html", []byte(bodyindex), 0600)
-		println("Warning del sensore " + deviceID + " aggiornato")
+		scriviIndexSensore(deviceID, path, numeroWarnings)
 	} else {
 		log.Fatal(err)
 	}
