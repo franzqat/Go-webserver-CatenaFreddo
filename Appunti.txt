@@ -63,6 +63,9 @@ polish
 
 GO:
 Migliorare contenuto index frontpage
+Mettiamo numero di warning sempre in maniera da utilizzare una unica funzione per generare l'index?
+
+Test della concorrenza(?)
 
 SCALA:
 

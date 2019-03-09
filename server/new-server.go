@@ -45,7 +45,7 @@ func main() {
 	       }
 	    })
 	*/
-	generaFrontIndex()
+	creaFrontIndex()
 	fmt.Println("Listening")
 
 	http.Handle("/", http.FileServer(http.Dir(*root)))
@@ -88,17 +88,16 @@ func (p *Page) save() error {
 	//The octal integer literal 0600, passed as the third parameter to WriteFile, indicates that the file should be created with read-write permissions for the current user only
 	os.MkdirAll(percorso+p.Title, os.FileMode(0522))
 
-	//controlla se esiste il jpg, in caso contrario crearlo
-
+	//controlla se esiste il jpg, in caso contrario lo crea
 	if _, err := os.Stat(percorso + p.Title + "/" + filenameJpg); err == nil {
 		//il file esiste
-
+		//non faccio nulla
 	} else if os.IsNotExist(err) {
-		// path/to/whatever does *not* exist
+		//file non esiste
 
 		ioutil.WriteFile(percorso+p.Title+"/"+filenameJpg, p.Body, 0600)
 
-		generaFrontIndex()
+		creaFrontIndex()
 
 	} else {
 		return err
@@ -108,24 +107,30 @@ func (p *Page) save() error {
 		//il file esiste
 	} else if os.IsNotExist(err) {
 		//creare index se non esiste
-		bodyindex := `
-      <!DOCTYPE html>
-      <head>
-      <link rel="stylesheet" href="/static/stylesheets/template.css">
-      </head>
-      <body>
-      <div class="center"> <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p></div>
 
-      <div class="welcome center">Sensore` + p.Title + `</div> 
-      <div>
-      <img class="center" src="` + p.Title + `.jpg" width="600" height="600" />
-      </div>      
-      </body>`
+		bodyindex := scriviIndexSensore(p.Title)
 		ioutil.WriteFile(percorso+p.Title+"/"+index, []byte(bodyindex), 0600)
+
 	} else {
 		return err
 	}
 	return nil
+}
+
+func scriviIndexSensore(deviceID string) string {
+	bodyindex := `
+  <!DOCTYPE html>
+  <head>
+  <link rel="stylesheet" href="/static/stylesheets/template.css">
+  </head>
+
+  <body>
+  <div class="center"> <p><a href="#" onclick="history.go(-1)"> Torna Indietro</a></p></div>
+
+  <div class="welcome center">Sensore` + deviceID + `</div> 
+  <div><img class="center" src="` + deviceID + `.jpg" width="600" height="600" /> </div>      
+  </body>`
+	return bodyindex
 }
 
 func aggiornaTabellaR(id string) {
@@ -136,8 +141,8 @@ func aggiornaTabellaR(id string) {
 
 }
 
-func generaFrontIndex() {
-	println("Front index generato")
+func creaFrontIndex() {
+	//legge il path relativo ./sensori/
 	files, err := ioutil.ReadDir("./sensori/")
 	if err != nil {
 		log.Fatal(err)
@@ -159,6 +164,7 @@ func generaFrontIndex() {
         <div class="welcome center">Frontpage</div>` + indirizzi + `
         </body>`
 		ioutil.WriteFile("./index.html", []byte(bodyindex), 0600)
+		println("Front index creato")
 	} else {
 		log.Fatal(err)
 	}
@@ -172,6 +178,7 @@ func updateIndex(deviceID string) {
 	if _, err := os.Stat(percorso + "/index.html"); err == nil {
 		//il file esiste
 
+		//TO Be updated??
 		bodyindex := `
       <!DOCTYPE html>
       <head>
@@ -189,8 +196,9 @@ func updateIndex(deviceID string) {
                   <img class="center" src="` + deviceID + `.jpg" width="600" height="600" />
                   </div>
                   </body>`
-		println("Warning del sensore " + deviceID + " aggiornato")
+
 		ioutil.WriteFile(percorso+"/index.html", []byte(bodyindex), 0600)
+		println("Warning del sensore " + deviceID + " aggiornato")
 	} else {
 		log.Fatal(err)
 	}
