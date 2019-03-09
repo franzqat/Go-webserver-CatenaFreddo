@@ -1,20 +1,16 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	_ "html/template"
-	"io/ioutil"
+	"fmt" 
+	"io/ioutil" //per scrittura su file
 	"log"
-	"net/http"
-	"os"
-	"os/exec"
-	_ "time"
-	"webserver/mongo"
+	"net/http" // funzionalità da server http
+	"os" //permette l'esecuzione come da riga di comando
+	"os/exec" //permette l'esecuzione come da riga di comando
+	"webserver/mongo" //permette query a mongo
 )
 
 //Create a struct that holds information to be displayed in our HTML file
-
 type Page struct {
 	Title string
 	Body  []byte
@@ -22,71 +18,56 @@ type Page struct {
 
 var Client = mongo.ConnectToMongo()
 
-/*
-var base = template.Must(template.New("base").Parse("header\n{{template \"content\"}}\nfooter"))
-//var content1 = template.Must(template.Must(base.Clone()).Parse(`{{define "content"}}<img src="`+ r.Form.Get("Device Id") + `.jpg" width="600" height="600" alt="My Pic">{{end}}`))
-
-func handler(w http.ResponseWriter, r *http.Request) {
-    t, _ := template.ParseFiles("body.html")
-    t.Execute(w, "Body: Hi this is my body")
-}*/
-
-//Go application entrypoint
+//Main
 func main() {
-	var root = flag.String("root", "./", "file system path")
 
-	// templates := template.Must(template.ParseFiles("templates/body.html"))
+	creaFrontIndex() //creazione dell'index della frontpage all'avvio del server
+	
+  fmt.Println("Listening")
 
-	/*
-	   http.HandleFunc("/sensori/" , func(w http.ResponseWriter, r *http.Request, deviceid string) {
-	     sensore := Sensore{"deviceid"}
-	     if err := templates.ExecuteTemplate(w, "body.html", sensore); err != nil {
-	          http.Error(w, err.Error(), http.StatusInternalServerError)
-	       }
-	    })
-	*/
-	creaFrontIndex()
-	fmt.Println("Listening")
+	http.Handle("/", http.FileServer(http.Dir("./"))) //inizializza un fileserver nella root
+	http.HandleFunc("/save/", saveHandler) //handler delle post al server
 
-	http.Handle("/", http.FileServer(http.Dir(*root)))
-	http.HandleFunc("/save/", saveHandler)
-
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", nil) // sta in ascolto di chiamate http pronto a servirle
 }
 
+//Gestore delle post
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 
 	body := r.FormValue("body") // al momento è vuoto
-	r.ParseForm()
+	r.ParseForm() //ParseForm popola r.Form con il contenuto della Request
 
-	println("Ricevuto dato da: " + r.Form.Get("Device Id") + " Warning:" + r.Form.Get("warning"))
+	println("Ricevuto dato da: " + r.Form.Get("Device Id") + "con Warning:" + r.Form.Get("warning"))
+  //post a mongoDB
 	mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("timestamp"), r.Form.Get("temperatura"), r.Form.Get("warning"), Client)
 
 	p := &Page{Title: r.Form.Get("Device Id"), Body: []byte(body)}
-	err := p.save()
+	err := p.save() //salva la pagina del sensore
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+  //esegue lo script in R
 	aggiornaTabellaR(r.Form.Get("Device Id"))
 
-	//if warning -> aggiorna index
+	//se c'è un warning aggiorna index indicando il numero corretto di warning
 	if r.Form.Get("warning") != "0" {
 		updateIndex(r.Form.Get("Device Id"))
 	}
 
 	http.Redirect(w, r, "/sensori/"+r.Form.Get("Device Id"), http.StatusFound)
-
 }
 
+//crea la pagina del sensore se non esiste
+//(p *Page) è un ricevitore (receiver) e si sta dichiarando il metodo save associato al ricevitore
 func (p *Page) save() error {
+
 	filenameJpg := p.Title + ".jpg"
 	index := "index.html"
 
 	var percorso = "sensori/"
 
-	//The octal integer literal 0600, passed as the third parameter to WriteFile, indicates that the file should be created with read-write permissions for the current user only
+	//creazione di tutte le directory fino al percorso finale
 	os.MkdirAll(percorso+p.Title, os.FileMode(0522))
 
 	//Controllo esistenza dei files se il sensore è nuovo
@@ -95,7 +76,7 @@ func (p *Page) save() error {
 		//non faccio nulla
 	} else if os.IsNotExist(err) {
 		//il file jpg non esiste
-		//crea il jpg
+		//crea il jpg vuoto
 		ioutil.WriteFile(percorso+p.Title+"/"+filenameJpg, p.Body, 0600)
 		//crea l'index
 		creaFrontIndex()
@@ -144,6 +125,7 @@ func aggiornaTabellaR(id string) {
 }
 
 func creaFrontIndex() {
+  os.MkdirAll("./sensori/", os.FileMode(0522))
 	//legge il path relativo ./sensori/
 	files, err := ioutil.ReadDir("./sensori/")
 	if err != nil {

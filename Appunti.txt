@@ -62,7 +62,7 @@ Documentazione
 polish
 
 GO:
-Migliorare contenuto index frontpage
+
 
 SCALA:
 
@@ -73,6 +73,7 @@ Mongo
 _______________________________________________
 
 DONE:
+Migliorare contenuto index frontpage
 Verificare il numero di warning nell'index del sensore
 Connettere mongo a go 
 accoppaire post a query di mongo X
