@@ -16,8 +16,9 @@ type Messaggio struct {
 	Warning     string
 }
 
+//si connette al database e restituisce il client connesso
 func ConnectToMongo() *mongo.Client {
-	//"mongodb+srv://utente:unict@progettoapl-zkgjt.mongodb.net/test?retryWrites=true"
+
 	Client, err := mongo.Connect(context.TODO(), "mongodb://127.0.0.1:27017/admin")
 
 	if err != nil {
@@ -35,59 +36,56 @@ func ConnectToMongo() *mongo.Client {
 	return Client
 }
 
+//esegue una query al database e restituisce il numero di warnings 
 func GetWarnings(sensorID string, Client *mongo.Client) string {
-	// Pass these options to the Find method
-	findOptions := options.Find()
-	findOptions.SetLimit(50)
 
+	findOptions := options.Find()
 	collection := Client.Database("test").Collection(sensorID)
 
-	filter := bson.D{{"warning", "1"}}
+	filter := bson.D{{"warning", "1"}} //filtra tutti i messaggi con warning
 
-	// Here's an array in which you can store the decoded documents
 	var results []*Messaggio
 
-	// Passing nil as the filter matches all documents in the collection
+	// Passare filter come filtro consente di matchare tutti i valori che matchano il filtro nella collezione
 	cur, err := collection.Find(context.TODO(), filter, findOptions)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Finding multiple documents returns a cursor
-	// Iterating through the cursor allows us to decode documents one at a time
+	// Itera il cursore su tutti i risultati trovati
 	for cur.Next(context.TODO()) {
 
-		// create a value into which the single document can be decoded
 		var elem Messaggio
-		err := cur.Decode(&elem)
+		err := cur.Decode(&elem) //decodifica l'elemento puntato dal cursore
 		if err != nil {
 			log.Fatal(err)
 		}
-		results = append(results, &elem)
+		results = append(results, &elem) //appende l'elemento al vettore di risultati
 	}
 
 	if err := cur.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	// Close the cursor once finished
+	// Chiude il cursore una volta finito
 	cur.Close(context.TODO())
 
-	return fmt.Sprintf("%d", len(results))
+	return fmt.Sprintf("%d", len(results)) //restiuisce la dimensione del vettore di risultati sotto forma di stringa
 }
 
+//esegue la post al database mongo con i valori ricevuti
 func PostTemperature(sensorID string, timestamp string, temperature string, warning string, Client *mongo.Client) {
 
 	collection := Client.Database("test").Collection(sensorID)
 
 	msg := Messaggio{timestamp, temperature, warning}
 	//POST al database
-	insertResult, err := collection.InsertOne(context.TODO(), msg)
+	_, err := collection.InsertOne(context.TODO(), msg)
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		fmt.Println("Inserted a single document: ", insertResult.InsertedID, msg.Warning)
+		fmt.Println("Inserito elemento del sensore " + sensorID + " su mongoDB")
 	}
 }
 

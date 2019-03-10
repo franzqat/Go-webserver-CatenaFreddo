@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt" 
+	"fmt"
 	"io/ioutil" //per scrittura su file
 	"log"
-	"net/http" // funzionalità da server http
-	"os" //permette l'esecuzione come da riga di comando
-	"os/exec" //permette l'esecuzione come da riga di comando
+	"net/http"        // funzionalità da server http
+	"os"              //permette l'esecuzione come da riga di comando
+	"os/exec"         //permette l'esecuzione come da riga di comando
 	"webserver/mongo" //permette query a mongo
 )
 
@@ -21,12 +21,12 @@ var Client = mongo.ConnectToMongo()
 //Main
 func main() {
 
-	creaFrontIndex() //creazione dell'index della frontpage all'avvio del server
-	
-  fmt.Println("Listening")
+	updateFrontPageIndex() //creazione dell'index della frontpage all'avvio del server
+
+	fmt.Println("Listening")
 
 	http.Handle("/", http.FileServer(http.Dir("./"))) //inizializza un fileserver nella root
-	http.HandleFunc("/save/", saveHandler) //handler delle post al server
+	http.HandleFunc("/save/", saveHandler)            //handler delle post al server
 
 	http.ListenAndServe(":8080", nil) // sta in ascolto di chiamate http pronto a servirle
 }
@@ -35,10 +35,10 @@ func main() {
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 
 	body := r.FormValue("body") // al momento è vuoto
-	r.ParseForm() //ParseForm popola r.Form con il contenuto della Request
+	r.ParseForm()               //ParseForm popola r.Form con il contenuto della Request
 
 	println("Ricevuto dato da: " + r.Form.Get("Device Id") + "con Warning:" + r.Form.Get("warning"))
-  //post a mongoDB
+	//post a mongoDB
 	mongo.PostTemperature(r.Form.Get("Device Id"), r.Form.Get("timestamp"), r.Form.Get("temperatura"), r.Form.Get("warning"), Client)
 
 	p := &Page{Title: r.Form.Get("Device Id"), Body: []byte(body)}
@@ -47,15 +47,13 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-  //esegue lo script in R
+	//esegue lo script in R
 	aggiornaTabellaR(r.Form.Get("Device Id"))
 
 	//se c'è un warning aggiorna index indicando il numero corretto di warning
 	if r.Form.Get("warning") != "0" {
 		updateIndex(r.Form.Get("Device Id"))
 	}
-
-	http.Redirect(w, r, "/sensori/"+r.Form.Get("Device Id"), http.StatusFound)
 }
 
 //crea la pagina del sensore se non esiste
@@ -70,7 +68,7 @@ func (p *Page) save() error {
 	//creazione di tutte le directory fino al percorso finale
 	os.MkdirAll(percorso+p.Title, os.FileMode(0522))
 
-	//Controllo esistenza dei files se il sensore è nuovo
+	//Controllo esistenza del file jpg; se non esiste il sensore è considerato nuovo e viene creato un nuovo jpg aggiornato l'index della frontpage
 	if _, err := os.Stat(percorso + p.Title + "/" + filenameJpg); err == nil {
 		//il file esiste
 		//non faccio nulla
@@ -78,20 +76,19 @@ func (p *Page) save() error {
 		//il file jpg non esiste
 		//crea il jpg vuoto
 		ioutil.WriteFile(percorso+p.Title+"/"+filenameJpg, p.Body, 0600)
-		//crea l'index
-		creaFrontIndex()
-
+		//aggiorna l'index della frontpage
+		updateFrontPageIndex()
 	} else {
 		return err
 	}
 
-	//se l'index del sensore non esiste
+	//controllo se l'index del sensore non esiste
 	if _, err := os.Stat(percorso + p.Title + "/" + index); err == nil {
 		//il file esiste
 	} else if os.IsNotExist(err) {
-		//creare index se non esiste
-    println("Creo l'index del sensore")
-		scriviIndexSensore(p.Title,percorso+p.Title+ "/" +index, "0")
+		//creazione index del sensore se non esiste
+		println("Nuovo sensore, creo l'index")
+		scriviIndexSensore(p.Title, percorso+p.Title+"/"+index, "0") //0 è il numero di warning iniziale
 
 	} else {
 		return err
@@ -99,6 +96,7 @@ func (p *Page) save() error {
 	return nil
 }
 
+// crea o aggiorna l'index.html del sensore
 func scriviIndexSensore(deviceID string, path string, warnings string) {
 	bodyindex := `
   <!DOCTYPE html>
@@ -116,6 +114,7 @@ func scriviIndexSensore(deviceID string, path string, warnings string) {
 	ioutil.WriteFile(path, []byte(bodyindex), 0600)
 }
 
+//esegue lo script di R
 func aggiornaTabellaR(id string) {
 	_, err := exec.Command("c://PROGRA~1/R/R-3.5.2/bin/x64/Rscript.exe", "--vanilla C:/Users/franz/go/src/webserver/R-Handler.R "+id).Output()
 	if err != nil {
@@ -124,13 +123,17 @@ func aggiornaTabellaR(id string) {
 
 }
 
-func creaFrontIndex() {
-  os.MkdirAll("./sensori/", os.FileMode(0522))
-	//legge il path relativo ./sensori/
+//aggiorna l'index della frontpage
+func updateFrontPageIndex() {
+	
+  os.MkdirAll("./sensori/", os.FileMode(0522)) //crea la cartella sensori se non esiste
+	
+  //legge il path relativo ./sensori/
 	files, err := ioutil.ReadDir("./sensori/")
 	if err != nil {
 		log.Fatal(err)
 	}
+  //crea un elenco dei sensori a partire dalle cartelle presenti
 	indirizzi := ""
 	for _, f := range files {
 		indirizzi += `<li><a href="http://localhost:8080/sensori/` + f.Name() + `/" > Sensore #` + f.Name() + `</a></li>
@@ -138,7 +141,7 @@ func creaFrontIndex() {
 	}
 
 	if _, err := os.Stat("./index.html"); err == nil {
-		//il file esiste
+		//l'index della frontpage esiste
 		bodyindex := `
         <!DOCTYPE html>
         <head>
@@ -154,8 +157,9 @@ func creaFrontIndex() {
 	} else {
 		log.Fatal(err)
 	}
-
 }
+
+//aggiorna l'index del sensore controllando il numero di warning tramite query a mongo
 func updateIndex(deviceID string) {
 
 	var numeroWarnings = mongo.GetWarnings(deviceID, Client)
