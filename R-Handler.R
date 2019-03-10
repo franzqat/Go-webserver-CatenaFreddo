@@ -4,7 +4,7 @@ if (length(args)==0) {
 }
 
 #path <- paste("D://magistrale/example1.jpg", sep="")
-#path hardcoded
+#path hardcoded dove salvare il jpg
 path <- paste("C://Users/franz/go/src/webserver/server/sensori/",args[1],"/",args[1],".jpg", sep="")
 
 library(mongolite) #libreria per mongo

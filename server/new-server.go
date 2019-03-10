@@ -18,6 +18,9 @@ type Page struct {
 
 var Client = mongo.ConnectToMongo()
 
+var PATH_RSCRIPT = "c://PROGRA~1/R/R-3.5.2/bin/x64/Rscript.exe" //modificare con il path di Rscript.exe
+var PATH_RHANDLER = "C:/Users/franz/go/src/webserver/R-Handler.R" //path dello script di R dentro il progetto
+
 //Main
 func main() {
 
@@ -116,7 +119,7 @@ func scriviIndexSensore(deviceID string, path string, warnings string) {
 
 //esegue lo script di R
 func aggiornaTabellaR(id string) {
-	_, err := exec.Command("c://PROGRA~1/R/R-3.5.2/bin/x64/Rscript.exe", "--vanilla C:/Users/franz/go/src/webserver/R-Handler.R "+id).Output()
+	_, err := exec.Command(PATH_RSCRIPT, "--vanilla " + PATH_RHANDLER+" "+ id).Output() //path assoluto hardcoded
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -40,12 +40,20 @@ DIPENDENZE
 
 GO
 https://github.com/mongodb/mongo-go-driver
-github.com/julienschmidt/httprouter
+
 R
 https://jeroen.github.io/mongolite/
+ggplot2
+ggfortify
+ggpmisc
+Cairo
+
+
+
+
 install.packages("mongolite")
 
-http://r-statistics.co/ggplot2-Tutorial-With-R.html#1.%20The%20Setup
+
 install.packages("ggplot2")
 install.packages("ggfortify")
 library(ggpmisc)
@@ -54,10 +62,14 @@ _______________________________________________
 ServerGO:
 gira su localhost:8080
 accetta get su /view/
-/edit/
 /save/ post
 _______________________________________________
 TODO:
+relazione in word
+behaviour da riguardare in readme
+pulizia e ordine librerie e files totali (accucchiare i repository)
+
+
 Documentazione
 polish
 
