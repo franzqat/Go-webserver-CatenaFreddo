@@ -1,16 +1,4 @@
-# Go-Webserver
-
-## **Librerie esterne**
-**GO**
-https://github.com/mongodb/mongo-go-driver
-
-**R**
-https://jeroen.github.io/mongolite/
-ggplot2
-ggfortify
-ggpmisc
-Cairo
-
+# Catena del freddo
 
 ## Architettura
 Viene associato un sensore di temperatura ad ogni trasporto.
@@ -23,6 +11,31 @@ L'home page contiene la lista di tutti i dispositivi attivi, linkando ognuno all
 Il sensore è stato reso più smart. Al fine di limitare la comunicazione e l'energia spesa, il sensore non comunica le variazioni di temperatura troppo piccole in un intervallo di tempo limitato, warning esclusi.
 Nel caso in cui il sensore non riesca a comunicare con il server, esso lavora in modalità offline mantenendo traccia dei warning eventualmente letti.
 Periodicamente effettua dei tentativi per ristabilire la connessione e, nel momento in cui ritorna online, comunica i dati registrati al server.
+
+### **Librerie esterne**
+**GO**
+https://github.com/mongodb/mongo-go-driver
+```
+Installare la libreria di GO inserendo nella cartella ~\go\src il contenuto di LibrerieGO.zip
+```
+
+
+**R**
+https://jeroen.github.io/mongolite/
+ggplot2
+ggfortify
+ggpmisc
+Cairo
+```
+Installare le librerie tramite comando:
+install.packages("mongolite")
+install.packages("ggplot2")
+install.packages("ggfortify")
+install.packages("ggpmisc")
+install.packages("Cairo")
+```
+
+
 
 ## Usage
 
@@ -58,7 +71,7 @@ Premesse:
 	Il database MongoDB è attivo
 	L'id dei sensori è univoco
 	
-1. Il sensore periodicamente invia il valore di temperatura [simulato], il timestamp e il proprio ID attraverso una chiamata POST al server GO
+1. Il sensore periodicamente invia il valore di temperatura [simulato], il timestamp, il proprio ID e un indicatore di warning attraverso una chiamata POST al server GO
 2. Il server riceve la POST e: 
 	2.1. Inserisce i dati nel database MongoDB nella collezione corrispondente all'ID
 	2.2. Crea, se non esistono, le cartelle e i files associati al sensore con quell'ID
@@ -66,5 +79,5 @@ Premesse:
 3. R elabora i dati e genera il jpg corrispondente e lo conserva nella cartella del server associata all'ID del sensore
 
 Dal punto di vista dell'utente:
-L'utente accede alla pagina localhost:8080 dove trova un elenco di links chiamate con l'ID del sensore.
-I link portano ad una pagina contente l'immagine plottata.
+L'utente accede alla pagina localhost:8080 dove trova un elenco di links alle pagine dei sensori.
+Le pagine congengono l'immagine plottata e il numero di warning ricevuti.
