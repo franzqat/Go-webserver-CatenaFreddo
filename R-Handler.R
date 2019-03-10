@@ -31,7 +31,7 @@ rm(connessioneMongo)
 alldata$timestamp <- as.POSIXct(as.numeric(as.character(alldata$timestamp)), origin="1970-01-01", tz="Etc/GMT+1")
 
 #Subset di warning, -18 è la temp corretta
-alertdata <- subset(alldata, as.numeric(temperatura) > -19.5)
+alertdata <- subset(alldata, as.numeric(temperatura) > -18.0)
 
 #PLOT
 p <- ggplot(alldata, aes(x=timestamp, y=as.numeric(temperatura), group=1)) +
