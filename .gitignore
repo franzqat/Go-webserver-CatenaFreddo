@@ -14,3 +14,17 @@
 .Rhistory
 *.RData
 *.lnk
+
+
+#scala
+*.class
+*.log
+target
+#*.iml
+*.ipr
+*.iws
+.idea
+out
+SensoreTemperatura/.idea/modules/SensoreTemperatura-build.iml
+*.iml
+*.iml
