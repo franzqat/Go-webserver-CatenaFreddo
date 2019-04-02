@@ -21,11 +21,11 @@ Installare la libreria di GO inserendo nella cartella ~\go\src il contenuto di L
 
 
 **R**
-https://jeroen.github.io/mongolite/
-ggplot2
-ggfortify
-ggpmisc
-Cairo
+* https://jeroen.github.io/mongolite/
+* ggplot2
+* ggfortify
+* ggpmisc
+* Cairo
 ```
 Installare le librerie tramite comando:
 install.packages("mongolite")
