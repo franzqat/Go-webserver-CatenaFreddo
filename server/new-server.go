@@ -71,7 +71,7 @@ func (p *Page) save() error {
 	//creazione di tutte le directory fino al percorso finale
 	os.MkdirAll(percorso+p.Title, os.FileMode(0522))
 
-	//Controllo esistenza del file jpg; se non esiste il sensore è considerato nuovo e viene creato un nuovo jpg aggiornato l'index della frontpage
+	//Controllo esistenza del file jpg; se non esiste il sensore è considerato nuovo e viene creato un nuovo jpg e aggiornato l'index della frontpage
 	if _, err := os.Stat(percorso + p.Title + "/" + filenameJpg); err == nil {
 		//il file esiste
 		//non faccio nulla
